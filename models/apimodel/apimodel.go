@@ -1,12 +1,27 @@
 package apimodel
 
 import (
+	"database/sql"
 	"mock_api/entities"
-	"mock_api/pkg"
 )
 
-func GetAll() ([]entities.Api, error) {
-	rows, err := pkg.DB.Query(`SELECT * FROM apis ORDER BY updated_at desc`)
+type RepositoryApi interface {
+	GetAll() ([]entities.Api, error)
+	Create(api entities.Api) bool
+	Detail(id int) entities.Api
+	Update(api entities.Api) bool
+	Delete(api entities.Api) error
+}
+type repositoryApi struct {
+	DB *sql.DB
+}
+
+func NewRepositoryAPI(DB *sql.DB) *repositoryApi {
+	return &repositoryApi{DB: DB}
+}
+
+func (r *repositoryApi) GetAll() ([]entities.Api, error) {
+	rows, err := r.DB.Query(`SELECT * FROM apis ORDER BY updated_at desc`)
 	if err != nil {
 		return nil, err
 	}
@@ -26,9 +41,9 @@ func GetAll() ([]entities.Api, error) {
 	return apis, nil
 }
 
-func Create(api entities.Api) bool {
+func (r *repositoryApi) Create(api entities.Api) bool {
 	var lastId int64
-	err := pkg.DB.QueryRow(`
+	err := r.DB.QueryRow(`
 		INSERT INTO apis (name, url, method, response, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
 		api.Name, api.Url, api.Method, api.Response, api.CreatedAt, api.UpdatedAt).Scan(&lastId)
@@ -40,8 +55,8 @@ func Create(api entities.Api) bool {
 	return lastId > 0
 }
 
-func Detail(id int) entities.Api {
-	row := pkg.DB.QueryRow(`SELECT * FROM apis where id = $1`, id)
+func (r *repositoryApi) Detail(id int) entities.Api {
+	row := r.DB.QueryRow(`SELECT * FROM apis where id = $1`, id)
 
 	var api entities.Api
 	if err := row.Scan(&api.Id, &api.Name, &api.Url, &api.Method, &api.Response, &api.CreatedAt, &api.UpdatedAt); err != nil {
@@ -50,9 +65,9 @@ func Detail(id int) entities.Api {
 	return api
 }
 
-func Update(api entities.Api) bool {
+func (r *repositoryApi) Update(api entities.Api) bool {
 	var updatedId int64
-	err := pkg.DB.QueryRow(`
+	err := r.DB.QueryRow(`
 		UPDATE apis
 		SET name = $1, url = $2, method = $3, response = $4, updated_at = $5
 		WHERE id = $6
@@ -66,8 +81,8 @@ func Update(api entities.Api) bool {
 	return updatedId > 0
 }
 
-func Delete(api entities.Api) error {
-	_, err := pkg.DB.Exec(`DELETE FROM apis where id = $1`, api.Id)
+func (r *repositoryApi) Delete(api entities.Api) error {
+	_, err := r.DB.Exec(`DELETE FROM apis where id = $1`, api.Id)
 
 	return err
 }

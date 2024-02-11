@@ -12,12 +12,12 @@ var (
 	DB *sql.DB
 )
 
-func DBConnection() {
+func DBConnection() *sql.DB {
 	db, err := sql.Open("postgres", os.Getenv("DB_URL"))
 	if err != nil {
 		panic(err)
 	}
 
 	log.Println("db connected")
-	DB = db
+	return db
 }

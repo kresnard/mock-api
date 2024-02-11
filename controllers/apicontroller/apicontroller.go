@@ -12,8 +12,16 @@ import (
 	"strings"
 )
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	apis, err := apimodel.GetAll()
+type apiController struct {
+	repo apimodel.RepositoryApi
+}
+
+func NewApiController(repo apimodel.RepositoryApi) apiController {
+	return apiController{repo: repo}
+}
+
+func (c *apiController) Index(w http.ResponseWriter, r *http.Request) {
+	apis, err := c.repo.GetAll()
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +40,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Add(w http.ResponseWriter, r *http.Request) {
+func (c *apiController) Add(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		temp, err := template.ParseFiles("views/api/create.html")
 		if err != nil {
@@ -90,7 +98,7 @@ func Add(w http.ResponseWriter, r *http.Request) {
 		}
 		api.ApiMapper(r)
 
-		ok := apimodel.Create(api)
+		ok := c.repo.Create(api)
 		if !ok {
 			temp, _ := template.ParseFiles("views/api/create.html")
 			temp.Execute(w, nil)
@@ -100,7 +108,7 @@ func Add(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Edit(w http.ResponseWriter, r *http.Request) {
+func (c *apiController) Edit(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		temp, err := template.ParseFiles("views/api/edit.html")
 		if err != nil {
@@ -113,7 +121,7 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		api := apimodel.Detail(id)
+		api := c.repo.Detail(id)
 		data := map[string]any{
 			"api": api,
 		}
@@ -178,7 +186,7 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 		api.ApiMapper(r)
 		api.Id = uint(id)
 
-		ok := apimodel.Update(api)
+		ok := c.repo.Update(api)
 		if !ok {
 			http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 		}
@@ -187,7 +195,7 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Delete(w http.ResponseWriter, r *http.Request) {
+func (c *apiController) Delete(w http.ResponseWriter, r *http.Request) {
 	idString := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idString)
 	if err != nil {
@@ -196,7 +204,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	var api entities.Api
 	api.Id = uint(id)
 
-	if err = apimodel.Delete(api); err != nil {
+	if err = c.repo.Delete(api); err != nil {
 		panic(err)
 	}
 
