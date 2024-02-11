@@ -3,6 +3,7 @@ package pkg
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -12,11 +13,10 @@ var (
 )
 
 func DBConnection() {
-	db, err := sql.Open("postgres", "postgres://postgres:password@localhost:5432/mock_api")
+	db, err := sql.Open("postgres", os.Getenv("DB_URL"))
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 
 	log.Println("db connected")
 	DB = db
