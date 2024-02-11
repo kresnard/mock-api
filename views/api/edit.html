@@ -21,7 +21,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link active text-light" href="/api">API</a>
+            <a class="nav-link active text-light" href="/apis">API</a>
           </li>
         </ul>
       </div>
@@ -45,9 +45,9 @@
             <input type="text" class="form-control" name="url" autocomplete="off" value="{{ .api.Url }}">
         </div>
         <div class="mb-3">
-            <label  class="form-label">Method</label>
-            <input type="text" class="form-control" name="method" autocomplete="off" value="{{ .api.Method }}" placeholder="GET" disabled>
-        </div>
+          <label  class="form-label">Method</label>
+          <input type="text" class="form-control" name="method" autocomplete="off" value="{{ .api.Method }}" placeholder="this form should be filled by GET, PUT, POST, PATCH, DELETE">
+      </div>
         <div class="mb-3">
             <label  class="form-label">Response</label>
             <input type="text" class="form-control" name="response" autocomplete="off" value="{{ .api.Response }}">

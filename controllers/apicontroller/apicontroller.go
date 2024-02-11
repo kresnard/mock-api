@@ -1,12 +1,15 @@
 package apicontroller
 
 import (
+	"encoding/json"
 	"html/template"
+	"log"
 	"mock_api/entities"
 	"mock_api/models/apimodel"
 	"net/http"
+	"regexp"
 	"strconv"
-	"time"
+	"strings"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +21,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	data := map[string]any{
 		"apis": apis,
 	}
+	log.Println(data)
 
 	temp, err := template.ParseFiles("views/api/index.html")
 	if err != nil {
@@ -40,12 +44,51 @@ func Add(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "POST" {
 		var api entities.Api
-		api.Name = r.FormValue("name")
-		api.Url = r.FormValue("url")
-		api.Method = "GET"
-		api.Response = r.FormValue("response")
-		api.CreatedAt = time.Now()
-		api.UpdatedAt = time.Now()
+		if r.FormValue("name") == "" || r.FormValue("url") == "" || r.FormValue("method") == "" || r.FormValue("response") == "" {
+			log.Println("form value can't be empty")
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+			return
+		}
+
+		pattern := `^/`
+		matched, _ := regexp.MatchString(pattern, r.FormValue("url"))
+		if matched {
+			log.Println("URL should not start with a slash")
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+			return
+		}
+
+		pattern = `\s`
+		matched, _ = regexp.MatchString(pattern, r.FormValue("url"))
+		if matched {
+			log.Println("URL can't contain whitespace")
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+			return
+		}
+
+		upperMethod := strings.ToUpper(r.FormValue("method"))
+		method := upperMethod
+		switch method {
+		case "GET", "POST", "PUT", "PATCH", "DELETE":
+			log.Println("Method is valid.")
+		default:
+			log.Println("Invalid method.")
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+		}
+
+		var parsedJson interface{}
+		err := json.Unmarshal([]byte(r.FormValue("response")), &parsedJson)
+		if err != nil {
+			log.Println(err)
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+			return
+		}
+		api.ApiMapper(r)
 
 		ok := apimodel.Create(api)
 		if !ok {
@@ -87,12 +130,53 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
+		if r.FormValue("name") == "" || r.FormValue("url") == "" || r.FormValue("method") == "" || r.FormValue("response") == "" {
+			log.Println("form value can't be empty")
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+			return
+		}
+
+		pattern := `^/`
+		matched, _ := regexp.MatchString(pattern, r.FormValue("url"))
+		if matched {
+			log.Println("URL should not start with a slash")
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+			return
+		}
+
+		pattern = `\s`
+		matched, _ = regexp.MatchString(pattern, r.FormValue("url"))
+		if matched {
+			log.Println("URL can't contain whitespace")
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+			return
+		}
+
+		upperMethod := strings.ToUpper(r.FormValue("method"))
+		method := upperMethod
+		switch method {
+		case "GET", "POST", "PUT", "PATCH", "DELETE":
+			log.Println("Method is valid.")
+		default:
+			log.Println("Invalid method.")
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+		}
+
+		var parsedJson interface{}
+		err = json.Unmarshal([]byte(r.FormValue("response")), &parsedJson)
+		if err != nil {
+			log.Println(err)
+			temp, _ := template.ParseFiles("views/api/create.html")
+			temp.Execute(w, nil)
+			return
+		}
+
+		api.ApiMapper(r)
 		api.Id = uint(id)
-		api.Name = r.FormValue("name")
-		api.Url = r.FormValue("url")
-		api.Method = "GET"
-		api.Response = r.FormValue("response")
-		api.UpdatedAt = time.Now()
 
 		ok := apimodel.Update(api)
 		if !ok {

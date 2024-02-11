@@ -21,7 +21,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link active text-light" href="/api">API</a>
+            <a class="nav-link active text-light" href="/apis">API</a>
           </li>
         </ul>
       </div>
@@ -37,19 +37,19 @@
     <form action="/apis/add" method="POST">
         <div class="mb-3">
             <label  class="form-label">Name</label>
-            <input type="text" class="form-control" name="name" autocomplete="off">
+            <input type="text" class="form-control" name="name" autocomplete="off" placeholder="this form should be filled">
         </div>
         <div class="mb-3">
             <label  class="form-label">URL</label>
-            <input type="text" class="form-control" name="url" autocomplete="off" placeholder="example: endpoint-list/list">
+            <input type="text" class="form-control" name="url" autocomplete="off" placeholder="this form should be filled, example: endpoint-list/list">
         </div>
         <div class="mb-3">
             <label  class="form-label">Method</label>
-            <input type="text" class="form-control" name="method" autocomplete="off" value="{{ .api.Method }}" placeholder="GET" disabled>
+            <input type="text" class="form-control" name="method" autocomplete="off" value="{{ .api.Method }}" placeholder="this form should be filled by GET, PUT, POST, PATCH, DELETE">
         </div>
         <div class="mb-3">
             <label  class="form-label">Response</label>
-            <input type="text" class="form-control" name="response" autocomplete="off">
+            <input type="text" class="form-control" name="response" autocomplete="off"  placeholder="this form should be filled with JSON format">
         </div>
         <div class="float-end">
             <a href="/apis" class="btn btn-secondary">back</a>

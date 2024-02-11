@@ -6,7 +6,7 @@ import (
 )
 
 func GetAll() ([]entities.Api, error) {
-	rows, err := pkg.DB.Query(`SELECT * FROM apis`)
+	rows, err := pkg.DB.Query(`SELECT * FROM apis ORDER BY updated_at desc`)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link active text-light" href="/api">API</a>
+            <a class="nav-link active text-light" href="/apis">API</a>
           </li>
         </ul>
       </div>
@@ -47,7 +47,7 @@
         {{ range .apis}}
         <tr>
           <td>{{ .Name }}</td>
-          <td>http://localhost:8181/api/{{ .Url }}</td>
+          <td>http://localhost:{yourPort}/api/{{ .Url }}</td>
           <td>
             <a href="/apis/edit?id={{ .Id }}" class="btn btn-warning text-light">Edit</a>
             <a href="/apis/delete?id={{ .Id }}" class="btn btn-danger text-light"
